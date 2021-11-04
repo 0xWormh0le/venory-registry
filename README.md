@@ -1,4 +1,4 @@
-# NFT Bundler
+# Valary Assignment
 
 ## Run Tests
 
