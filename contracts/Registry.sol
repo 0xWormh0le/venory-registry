@@ -2,13 +2,14 @@
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
+import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/utils/Create2.sol";
 import "hardhat/console.sol";
 import "./Utils.sol";
 import "./IRegistry.sol";
 
 
-contract Registry is IRegistry, ERC721URIStorage {
+contract Registry is IRegistry, ERC721URIStorage, ReentrancyGuard {
     /// @dev mapping of user to signature verification nonce
     mapping(address => uint256) nonces;
 
@@ -26,6 +27,7 @@ contract Registry is IRegistry, ERC721URIStorage {
 
     constructor(string memory _name, string memory _symbol)
         ERC721(_name, _symbol)
+        ReentrancyGuard()
     { }
 
     receive() external payable { }
@@ -84,7 +86,7 @@ contract Registry is IRegistry, ERC721URIStorage {
         bytes calldata _data,
         string memory _serviceName,
         bytes memory _signature
-    ) external payable override returns(bytes memory result) {
+    ) external payable override nonReentrant() returns(bytes memory result) {
         address signer = services[_serviceName].eoa;
 
         require(signer != address(0), "Registry: unregistered service");
